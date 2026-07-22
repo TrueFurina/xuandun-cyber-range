@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>玄盾 XUANDUN · AI 攻防靶场系统</title>
+  <meta name="description" content="玄盾是面向红蓝对抗训练的 AI 攻防靶场系统，基于多智能体强化学习自动化生成、调度与评估攻防演练。" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+  <!-- 字体：非阻塞加载，加载失败自动回退系统字体，绝不阻塞首屏脚本 -->
+  <link rel="stylesheet" media="print" onload="this.media='all'"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" />
+  </noscript>
+</head>
+<body>
+  <div id="app" aria-busy="true">
+    <div class="boot-screen">
+      <div class="boot-logo">玄盾<span>XUANDUN</span></div>
+      <div class="boot-bar"><i></i></div>
+      <div class="boot-tip" id="bootTip">正在初始化靶场内核…</div>
+    </div>
+  </div>
+
+  <script>
+    // 看门狗：若 8s 后模块仍未接管页面，给出可读提示而非无限转圈
+    window.__bootTimer = setTimeout(function () {
+      var t = document.getElementById('bootTip');
+      if (t && t.textContent.indexOf('内核') >= 0) {
+        t.textContent = '加载超时：请检查网络后刷新，或改用本地浏览器打开';
+      }
+    }, 8000);
+  </script>
+  <script type="module" src="assets/js/main.js"
+          onerror="var t=document.getElementById('bootTip');if(t)t.textContent='核心脚本加载失败，请刷新重试';"></script>
+</body>
+</html>

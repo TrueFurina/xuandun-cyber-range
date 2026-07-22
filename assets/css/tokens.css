@@ -1,0 +1,51 @@
+/* ============================================================
+   玄盾 XUANDUN · 设计令牌 (Design Tokens)
+   暗色赛博安全风 / 商业级 Web 应用
+   ============================================================ */
+:root {
+  /* —— 基底色 —— */
+  --bg-base:    #0A0E14;
+  --bg-sidebar: #080C12;
+  --bg-panel:   #0E141F;
+  --bg-elev:    #111824;
+  --bg-input:   #0C121C;
+
+  /* —— 语义色 —— */
+  --accent:      #2DE1A0; /* 荧光绿：主色 / 防御 / 在线 */
+  --accent-dim:  #1AA876;
+  --red:         #FF4D6D; /* 攻击红 */
+  --red-dim:     #C4364F;
+  --cyan:        #38BDF8; /* 防御青 */
+  --cyan-dim:    #2A86B0;
+  --orange:      #F5A623; /* 警告橙 */
+  --orange-dim:  #B97C12;
+
+  /* —— 文字色 —— */
+  --text-hi:  #E6EDF3;
+  --text-mid: #8A94A6;
+  --text-lo:  #5A6877;
+
+  /* —— 描边 / 分隔 —— */
+  --line:        rgba(120, 140, 170, 0.12);
+  --line-strong: rgba(120, 140, 170, 0.22);
+  --glow-accent: rgba(45, 225, 160, 0.35);
+  --glow-red:    rgba(255, 77, 109, 0.35);
+  --glow-cyan:   rgba(56, 189, 248, 0.35);
+
+  /* —— 字体 —— */
+  --font-sans: "Noto Sans SC", "Sarasa Gothic SC", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Roboto Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* —— 间距 / 圆角 / 阴影 —— */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+  --shadow-panel: 0 1px 0 rgba(255,255,255,0.03) inset, 0 12px 30px -12px rgba(0,0,0,0.6);
+  --shadow-pop: 0 18px 50px -18px rgba(0,0,0,0.75);
+
+  /* —— 布局 —— */
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+  --maxw: 1240px;
+}

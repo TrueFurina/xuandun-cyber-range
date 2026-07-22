@@ -1,0 +1,13 @@
+{
+  "name": "xuandun-ai-range",
+  "version": "1.0.0",
+  "description": "玄盾 XUANDUN · AI 攻防靶场系统 — 暗色赛博安全风商业级 Web 应用（产品落地页 + 实时控制台）",
+  "type": "module",
+  "scripts": {
+    "dev": "node serve.mjs",
+    "build:offline": "node build-offline.mjs"
+  },
+  "keywords": ["cybersecurity", "red-team", "blue-team", "marl", "dashboard", "xuandun"],
+  "license": "MIT",
+  "private": false
+}

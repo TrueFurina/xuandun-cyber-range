@@ -1,0 +1,14 @@
+# 依赖与构建
+node_modules/
+dist/
+
+# 工具/运行时元数据
+.workbuddy/
+.tmpcheck/
+*.tmp
+*.mjs.tmp
+
+# 系统
+.DS_Store
+Thumbs.db
+*.log
