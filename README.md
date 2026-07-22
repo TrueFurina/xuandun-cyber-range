@@ -24,6 +24,11 @@
   - 焦点可见性、`prefers-reduced-motion` 可访问性支持（已扩展到攻击态势图：减少动态时静态渲染）。
   - 抽屉 `role="dialog"` + `aria-modal` + ESC 关闭 + 焦点管理；导航 `aria-current`；搜索框 `aria-label`；未知路由 404 视图。
   - 内联 SVG favicon、`theme-color` 与 Open Graph / Twitter Card 社交卡片；`<noscript>` 兜底提示。
+  - **全局错误捕获**：`window.error` + `unhandledrejection` 统一兜底，任何未捕获异常弹出可读 toast，杜绝白屏。
+- **全局搜索**：顶栏输入关键字回车，跨靶机 / 演练 / 智能体 / 战队实时检索，命中项可直接打开详情抽屉。
+- **PWA 就绪**：`manifest.webmanifest` + Service Worker（应用外壳缓存、离线可用、可安装到桌面）。
+- **CI/CD**：GitHub Actions（`.github/workflows/deploy.yml`）在 push 到 `main` 时自动构建并发布到 GitHub Pages。
+- **SEO**：`robots.txt` + `sitemap.xml`，搜索引擎友好。
 - **离线单文件版**：`npm run build:offline` 生成 `dist/offline.html`（CSS/JS 全内联、零外部依赖）。
 
 ---
@@ -75,11 +80,13 @@ npm run build:offline
 
 ## 🌐 部署
 
-### GitHub Pages（推荐，零成本）
+### GitHub Pages（推荐，已配 CI 自动部署）
 
-1. 推送到 GitHub 仓库。
-2. 仓库 **Settings → Pages → Build and deployment → Source: Deploy from a branch → 选 `main` / `root`**。
-3. 访问 `https://<user>.github.io/<repo>/`。
+本仓库自带 `.github/workflows/deploy.yml`，push 到 `main` 会自动发布：
+
+1. 仓库 **Settings → Pages → Build and deployment → Source: 选 `GitHub Actions`**（仅需一次）。
+2. 之后每次 `git push` 到 `main`，Actions 会自动构建并部署。
+3. 访问 `https://<user>.github.io/<repo>/`（本项目：`https://truefurina.github.io/xuandun-cyber-range/`）。
 
 > 本项目是纯静态站点，无需构建步骤，根目录 `index.html` 即入口。
 
@@ -117,12 +124,17 @@ function startSimulator(store) {
 ```
 .
 ├─ index.html
-├─ serve.mjs            # 零依赖开发服务器
-├─ build-offline.mjs    # 离线单文件构建
+├─ manifest.webmanifest   # PWA 清单
+├─ sw.js                  # Service Worker（离线缓存）
+├─ robots.txt / sitemap.xml  # SEO
+├─ serve.mjs              # 零依赖开发服务器
+├─ build-offline.mjs      # 离线单文件构建
 ├─ package.json
 ├─ README.md
 ├─ LICENSE
+├─ .github/workflows/deploy.yml  # GitHub Pages 自动部署
 └─ assets/
+   ├─ icon.svg
    ├─ css/{tokens,app}.css
    └─ js/{store,components,landing,console,router,main}.js
 ```

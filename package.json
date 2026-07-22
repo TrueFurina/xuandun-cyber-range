@@ -1,6 +1,6 @@
 {
   "name": "xuandun-ai-range",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "玄盾 XUANDUN · AI 攻防靶场系统 — 暗色赛博安全风商业级 Web 应用（产品落地页 + 实时控制台）",
   "type": "module",
   "scripts": {

@@ -332,6 +332,22 @@ a:focus-visible, button:focus-visible, input:focus-visible,
 @keyframes viewEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* 404 视图 */
 .notfound { padding: 40px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+/* 搜索结果行 */
+.sr-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.sr-row:last-child { border-bottom: none; }
+.sr-row b { color: var(--text-hi); font-size: 14px; flex: 0 0 auto; }
+.sr-row .muted { flex: 1 1 auto; font-size: 12px; }
+.sr-row.clickable { cursor: pointer; transition: background .15s; }
+.sr-row.clickable:hover { background: var(--bg-input); }
+/* 全局错误 toast */
+.global-toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+  background: rgba(255,77,109,.12); border: 1px solid var(--red, #FF4D6D); color: #FF8FA3;
+  padding: 11px 20px; border-radius: 10px; font-size: 13px; font-family: var(--font-sans);
+  z-index: 9999; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4); max-width: min(90vw, 420px); text-align: center;
+}
+.global-toast.show { opacity: 1; transform: translate(-50%, 0); }
 /* 尊重「减少动态效果」系统偏好 */
 @media (prefers-reduced-motion: reduce) {
   .boot-bar i, .dot.green, .term-body .ln, .log .row, .view-enter { animation: none !important; }

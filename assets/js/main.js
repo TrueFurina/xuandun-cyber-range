@@ -10,6 +10,30 @@ const app = document.getElementById('app');
 let currentApp = null;
 let consoleApi = null;
 
+// —— 全局错误兜底：任何未捕获异常都给用户可读提示，而非静默白屏/无限转圈 ——
+function toast(msg) {
+  let el = document.getElementById('globalToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'globalToast';
+    el.className = 'global-toast';
+    el.setAttribute('role', 'alert');
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 4200);
+}
+window.addEventListener('error', (e) => {
+  console.error('[玄盾] 未捕获错误:', e.error || e.message);
+  toast('发生异常，部分功能可能受影响');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[玄盾] 未处理的 Promise 拒绝:', e.reason);
+  toast('请求异常，请稍后重试');
+});
+
 function render() {
   const r = resolve(location.hash);
   if (r.app === 'landing') {
@@ -42,4 +66,11 @@ try {
   const t = document.getElementById('bootTip');
   if (t) t.textContent = '初始化失败: ' + (e && e.message ? e.message : e);
   console.error(e);
+}
+
+// —— PWA：注册 Service Worker（离线可用 / 可安装）。失败不影响主流程 ——
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((err) => console.warn('[玄盾] SW 注册失败:', err));
+  });
 }

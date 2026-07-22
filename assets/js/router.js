@@ -4,7 +4,7 @@
 // #/console     -> 控制台总览
 // #/overview|ranges|drills|red|blue|rank -> 控制台子视图
 // ============================================================
-const ROUTES = ['overview', 'ranges', 'drills', 'red', 'blue', 'rank'];
+const ROUTES = ['overview', 'ranges', 'drills', 'red', 'blue', 'rank', 'search'];
 
 export function resolve(hash) {
   const h = (hash || '').replace(/^#\/?/, '');

@@ -1,0 +1,17 @@
+{
+  "name": "玄盾 XUANDUN · AI 攻防靶场系统",
+  "short_name": "玄盾",
+  "description": "面向红蓝对抗训练的 AI 攻防靶场系统，基于多智能体强化学习自动化生成、调度与评估攻防演练。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0A0E14",
+  "theme_color": "#0A0E14",
+  "categories": ["security", "education", "productivity"],
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

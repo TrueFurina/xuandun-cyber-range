@@ -280,6 +280,50 @@ function viewLeaderboard(content) {
   return store.on('leaderboard', render);
 }
 
+// ---------- 全局搜索 ----------
+let searchQuery = '';
+export function setSearchQuery(q) { searchQuery = (q || '').trim(); }
+
+function runSearch(q) {
+  const kw = q.toLowerCase();
+  const s = store.get();
+  const hit = (txt) => String(txt).toLowerCase().includes(kw);
+  const ranges = s.ranges.filter((r) => hit(r.name) || hit(r.os) || hit(r.status) || hit(r.difficulty));
+  const drills = s.drills.filter((d) => hit(d.name) || hit(d.red) || hit(d.blue) || hit(d.status));
+  const agents = [...s.teams.red, ...s.teams.blue].filter((t) => hit(t.name) || hit(t.agent) || hit(t.policy) || hit(t.status));
+  const teams = s.leaderboard.filter((t) => hit(t.name) || hit(t.type));
+  return { ranges, drills, agents, teams, total: ranges.length + drills.length + agents.length + teams.length };
+}
+
+function viewSearch(content) {
+  const q = searchQuery;
+  if (!q) {
+    content.innerHTML = `<div class="page-head"><div><h1>搜索</h1><p>输入关键字检索靶机、演练、智能体或战队</p></div></div>
+      <div class="notfound panel"><p class="muted">在顶部搜索框输入关键字后回车即可检索。</p></div>`;
+    return;
+  }
+  const res = runSearch(q);
+  const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const section = (title, tag, items, render) => items.length
+    ? `<div class="panel" style="margin-bottom:16px"><div class="panel-head"><h3>${title}</h3><span class="tag ${tag}">${items.length}</span></div><div class="panel-body">${items.map(render).join('')}</div></div>`
+    : '';
+
+  content.innerHTML = `
+    <div class="page-head"><div><h1>搜索结果</h1><p>关键字 “<b class="mono">${esc(q)}</b>” · 命中 ${res.total} 条</p></div>
+      <div class="tag ${res.total ? 'green' : 'lo'}"><span class="dot ${res.total ? 'green' : 'lo'}"></span>${res.total ? '已匹配' : '无结果'}</div></div>
+    ${res.total === 0 ? '<div class="notfound panel"><p class="muted">未找到匹配项，换个关键字试试（如 Web、SQLi、红队、QMIX）。</p></div>' : ''}
+    ${section('靶机环境', 'cyan', res.ranges, (r) => `<div class="sr-row clickable" data-t="range" data-id="${r.id}"><b>${esc(r.name)}</b><span class="muted">${esc(r.os)} · ${esc(r.difficulty)}</span><span class="tag ${r.status === '在线' ? 'green' : r.status === '演练中' ? 'orange' : 'lo'}">${r.status}</span></div>`)}
+    ${section('对抗演练', 'orange', res.drills, (d) => `<div class="sr-row clickable" data-t="drill" data-id="${d.id}"><b>${esc(d.name)}</b><span class="muted">${esc(d.red)} vs ${esc(d.blue)}</span><span class="tag ${d.status === '进行中' ? 'green' : d.status === '复盘' ? 'cyan' : 'lo'}">${d.status}</span></div>`)}
+    ${section('AI 智能体', 'red', res.agents, (t) => `<div class="sr-row"><b>${esc(t.name)}</b><span class="muted">${esc(t.agent)} · ${esc(t.policy)}</span><span class="tag ${t.color === 'red' ? 'red' : 'cyan'}">${esc(t.status)}</span></div>`)}
+    ${section('战队排名', 'green', res.teams, (t) => `<div class="sr-row"><b>#${t.rank} ${esc(t.name)}</b><span class="muted">胜率 ${t.winRate}% · ${t.score.toLocaleString()} 分</span><span class="tag ${t.type === '红队' ? 'red' : 'cyan'}">${esc(t.type)}</span></div>`)}
+  `;
+
+  content.querySelectorAll('.sr-row[data-t="range"]').forEach((el) =>
+    el.addEventListener('click', () => openDrawer(targetDetail(store.get().ranges.find((x) => x.id === el.dataset.id)))));
+  content.querySelectorAll('.sr-row[data-t="drill"]').forEach((el) =>
+    el.addEventListener('click', () => openDrawer(drillTimeline(store.get().drills.find((x) => x.id === el.dataset.id)))));
+}
+
 function viewNotFound(content) {
   content.innerHTML = `
     <div class="page-head"><div><h1>页面未找到</h1><p>该控制台视图不存在或暂未开放</p></div></div>
@@ -292,6 +336,7 @@ function viewNotFound(content) {
 const VIEWS = {
   overview: viewOverview, ranges: viewRanges, drills: viewDrills,
   red: (c) => viewTeam(c, 'red'), blue: (c) => viewTeam(c, 'blue'), rank: viewLeaderboard,
+  search: viewSearch,
 };
 
 // ---------- 外壳 ----------
@@ -331,6 +376,20 @@ export function mountConsole(root) {
   const contentEl = root.querySelector('#consoleContent');
   const clk = root.querySelector('#clk');
   navEls.forEach((el) => el.addEventListener('click', () => { location.hash = '#/' + el.dataset.route; closeSb(); }));
+
+  // —— 顶栏搜索：回车触发全局检索并跳转到搜索结果视图 ——
+  const searchInput = root.querySelector('.search input');
+  if (searchInput) {
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const q = searchInput.value.trim();
+      if (!q) return;
+      setSearchQuery(q);
+      if (location.hash === '#/search') show('search'); // 同视图内回车需手动重渲染
+      else location.hash = '#/search';
+      closeSb();
+    });
+  }
   offClk = store.on('clock', (d) => { clk.textContent = d.toTimeString().slice(0, 8); });
 
   function show(route) {

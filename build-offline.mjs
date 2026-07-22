@@ -27,6 +27,10 @@ html = html.replace('<link rel="stylesheet" href="assets/css/app.css" />', '');
 html = html.replace(/<!-- 字体[^\n]*\n/, '');
 html = html.replace(/<link rel="stylesheet" media="print"[^>]*>\s*/g, '');
 html = html.replace(/<noscript>[\s\S]*?<\/noscript>\s*/g, '');
+// 离线单文件：移除依赖网络/同源路径的 PWA 外链（SW 注册代码自带 http 协议守卫，file:// 下自动跳过）
+html = html.replace(/<link rel="apple-touch-icon"[^>]*>\s*/g, '');
+html = html.replace(/<link rel="manifest"[^>]*>\s*/g, '');
+html = html.replace(/<meta name="apple-mobile-web-app-[^>]*>\s*/g, '');
 html = html.replace(
   /<script type="module" src="assets\/js\/main.js"[^>]*><\/script>/,
   `<script type="module">\n${js}\n</script>`

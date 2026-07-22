@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://truefurina.github.io/xuandun-cyber-range/sitemap.xml
