@@ -63,29 +63,32 @@ export class AttackMap {
   constructor(canvas, nodes) {
     this.canvas = canvas; this.nodes = nodes; this.arcs = []; this.raf = null;
     this.colorMap = { RED: '#FF4D6D', BLUE: '#38BDF8' };
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this._loop = this._loop.bind(this);
+    this._onResize = () => this.resize();
     this._onVis = () => {
       if (document.hidden) { if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; } }
-      else if (!this.raf && this.arcs.length) { this.raf = requestAnimationFrame(this._loop); }
+      else if (!this.raf && this.arcs.length && !this.reduced) { this.raf = requestAnimationFrame(this._loop); }
     };
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    window.addEventListener('resize', this._onResize);
     window.addEventListener('visibilitychange', this._onVis);
-    this.raf = requestAnimationFrame(this._loop);
+    if (this.reduced) { this._staticDraw(); }
+    else { this.raf = requestAnimationFrame(this._loop); }
   }
   resize() { this._dims = fitCanvas(this.canvas); }
   fire(srcId, dstId, side) {
     if (srcId === dstId) return;
     this.arcs.push({ src: srcId, dst: dstId, color: this.colorMap[side] || '#2DE1A0', t: 0 });
     if (this.arcs.length > 14) this.arcs.shift();
-    if (!this.raf && !document.hidden) this.raf = requestAnimationFrame(this._loop);
+    if (this.reduced) { this._staticDraw(); }
+    else if (!this.raf && !document.hidden) { this.raf = requestAnimationFrame(this._loop); }
   }
-  _loop() {
+  _render() {
     const { ctx, w, h } = this._dims;
     ctx.clearRect(0, 0, w, h);
     const P = 26;
     const pos = (n) => ({ x: P + n.x * (w - 2 * P), y: P + n.y * (h - 2 * P) });
-    // 节点
     this.nodes.forEach((n) => {
       const p = pos(n);
       ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
@@ -96,7 +99,6 @@ export class AttackMap {
       ctx.fillStyle = 'rgba(138,148,166,0.85)'; ctx.font = '10px JetBrains Mono, monospace';
       ctx.textAlign = 'center'; ctx.fillText(n.label, p.x, p.y - 16);
     });
-    // 弧线
     this.arcs.forEach((a) => {
       const s = this.nodes.find((n) => n.id === a.src), d = this.nodes.find((n) => n.id === a.dst);
       if (!s || !d) return;
@@ -106,17 +108,22 @@ export class AttackMap {
       ctx.beginPath(); ctx.moveTo(ps.x, ps.y); ctx.lineTo(hx, hy); ctx.stroke();
       ctx.beginPath(); ctx.arc(hx, hy, 3.2, 0, Math.PI * 2);
       ctx.fillStyle = a.color; ctx.shadowColor = a.color; ctx.shadowBlur = 8; ctx.fill(); ctx.shadowBlur = 0;
-      a.t += 0.018;
     });
+  }
+  _staticDraw() { this.arcs.forEach((a) => (a.t = 1)); this._render(); }
+  _loop() {
+    this._render();
+    this.arcs.forEach((a) => (a.t += 0.018));
     this.arcs = this.arcs.filter((a) => a.t < 1);
     // 无活动弧线时进入空闲，停止动画循环以省 CPU
-    if (this.arcs.length > 0 && !document.hidden) {
-      this.raf = requestAnimationFrame(this._loop);
-    } else {
-      this.raf = null;
-    }
+    if (this.arcs.length > 0 && !document.hidden) { this.raf = requestAnimationFrame(this._loop); }
+    else { this.raf = null; }
   }
-  destroy() { if (this.raf) cancelAnimationFrame(this.raf); window.removeEventListener('visibilitychange', this._onVis); }
+  destroy() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('visibilitychange', this._onVis);
+  }
 }
 
 // —— 流式终端日志 ——

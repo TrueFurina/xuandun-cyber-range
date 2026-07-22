@@ -327,9 +327,14 @@ a:focus-visible, button:focus-visible, input:focus-visible,
 }
 /* 视图级错误提示 */
 .view-error { padding: 40px; text-align: center; color: var(--text-mid); font-family: var(--font-mono); font-size: 13px; line-height: 1.9; }
+/* 视图切换淡入 */
+.view-enter { animation: viewEnter .28s ease; }
+@keyframes viewEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* 404 视图 */
+.notfound { padding: 40px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
 /* 尊重「减少动态效果」系统偏好 */
 @media (prefers-reduced-motion: reduce) {
-  .boot-bar i, .dot.green, .term-body .ln, .log .row { animation: none !important; }
+  .boot-bar i, .dot.green, .term-body .ln, .log .row, .view-enter { animation: none !important; }
   .cap:hover, .card:hover, .btn-primary:hover { transform: none !important; }
   .prog i { transition: none !important; }
 }

@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>玄盾 XUANDUN · AI 攻防靶场系统</title>
   <meta name="description" content="玄盾是面向红蓝对抗训练的 AI 攻防靶场系统，基于多智能体强化学习自动化生成、调度与评估攻防演练。" />
+  <meta name="keywords" content="AI攻防,红蓝对抗,靶场,网络安全,多智能体强化学习,MARL,态势感知" />
+  <meta name="author" content="玄盾 XUANDUN" />
+  <meta name="theme-color" content="#0A0E14" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="玄盾 XUANDUN" />
+  <meta property="og:title" content="玄盾 XUANDUN · AI 攻防靶场系统" />
+  <meta property="og:description" content="面向红蓝对抗训练的 AI 攻防靶场系统，让防御策略在真实对抗压力下持续进化。" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="玄盾 XUANDUN · AI 攻防靶场系统" />
+  <meta name="twitter:description" content="面向红蓝对抗训练的 AI 攻防靶场系统，让防御策略在真实对抗压力下持续进化。" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230A0E14'/%3E%3Ctext x='16' y='22' font-size='20' text-anchor='middle' fill='%232DE1A0' font-family='monospace' font-weight='bold'%3E玄%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="assets/css/tokens.css" />
   <link rel="stylesheet" href="assets/css/app.css" />
   <!-- 字体：非阻塞加载，加载失败自动回退系统字体，绝不阻塞首屏脚本 -->
@@ -22,6 +33,14 @@
       <div class="boot-tip" id="bootTip">正在初始化靶场内核…</div>
     </div>
   </div>
+
+  <noscript>
+    <style>.boot-screen { display: none; }</style>
+    <div style="position:fixed;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;padding:24px;text-align:center;color:#8A94A6;font-family:var(--font-sans);background:#0A0E14">
+      <div style="font-size:22px;font-weight:700;color:#E6EDF3">玄盾 XUANDUN</div>
+      <div style="max-width:420px;line-height:1.7">本系统的实时态势、控制台与可视化依赖 JavaScript。<br/>请在浏览器设置中启用 JavaScript 后刷新页面。</div>
+    </div>
+  </noscript>
 
   <script>
     // 看门狗：若 8s 后模块仍未接管页面，给出可读提示而非无限转圈

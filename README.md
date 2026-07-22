@@ -21,7 +21,9 @@
   - 后台标签页暂停模拟、攻击图空闲停帧（省 CPU）。
   - 订阅回调统一异常防护 + 视图错误边界 + 路由切换兜底。
   - 外部字体非阻塞加载，启动看门狗，出错显示可读提示而非无限转圈。
-  - 焦点可见性、`prefers-reduced-motion` 可访问性支持。
+  - 焦点可见性、`prefers-reduced-motion` 可访问性支持（已扩展到攻击态势图：减少动态时静态渲染）。
+  - 抽屉 `role="dialog"` + `aria-modal` + ESC 关闭 + 焦点管理；导航 `aria-current`；搜索框 `aria-label`；未知路由 404 视图。
+  - 内联 SVG favicon、`theme-color` 与 Open Graph / Twitter Card 社交卡片；`<noscript>` 兜底提示。
 - **离线单文件版**：`npm run build:offline` 生成 `dist/offline.html`（CSS/JS 全内联、零外部依赖）。
 
 ---

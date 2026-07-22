@@ -135,7 +135,10 @@ class Store {
     return () => this._subs.get(evt).delete(g);
   }
   emit(evt, payload) {
-    (this._subs.get(evt) || []).forEach((fn) => fn(payload, this.state));
+    const subs = this._subs.get(evt);
+    if (!subs || !subs.size) return;
+    // 复制一份再迭代：允许订阅回调中安全地退订自身，不影响本次广播
+    [...subs].forEach((fn) => fn(payload, this.state));
   }
   get() { return this.state; }
 }

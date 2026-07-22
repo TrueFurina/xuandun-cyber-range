@@ -7,22 +7,37 @@ import { ICONS, AttackMap, TerminalLog, sparkline, lineChart } from './component
 const COLORS = { green: '#2DE1A0', cyan: '#38BDF8', red: '#FF4D6D', orange: '#F5A623' };
 const colorOf = (c) => COLORS[c] || '#2DE1A0';
 
-// —— 抽屉 / 弹层基础设施 ——
+// —— 抽屉 / 弹层基础设施（含无障碍：role=dialog / ESC 关闭 / 焦点管理）——
+let _drawerLastFocus = null;
+function onDrawerKey(e) { if (e.key === 'Escape') closeDrawer(); }
 function openDrawer(html) {
   closeDrawer();
+  _drawerLastFocus = document.activeElement;
   const backdrop = document.createElement('div');
   backdrop.className = 'drawer-backdrop';
   backdrop.addEventListener('click', closeDrawer);
   const panel = document.createElement('div');
   panel.className = 'drawer';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-label', '详情面板');
   panel.innerHTML = '<button class="drawer-close" aria-label="关闭">✕</button>' + html;
-  panel.querySelector('.drawer-close').addEventListener('click', closeDrawer);
+  const closeBtn = panel.querySelector('.drawer-close');
+  closeBtn.addEventListener('click', closeDrawer);
   document.body.appendChild(backdrop);
   document.body.appendChild(panel);
-  requestAnimationFrame(() => { backdrop.classList.add('show'); panel.classList.add('show'); });
+  document.addEventListener('keydown', onDrawerKey);
+  requestAnimationFrame(() => {
+    backdrop.classList.add('show');
+    panel.classList.add('show');
+    closeBtn.focus();
+  });
 }
 function closeDrawer() {
+  document.removeEventListener('keydown', onDrawerKey);
   document.querySelectorAll('.drawer-backdrop, .drawer').forEach((el) => el.remove());
+  if (_drawerLastFocus && document.contains(_drawerLastFocus)) _drawerLastFocus.focus();
+  _drawerLastFocus = null;
 }
 
 const NAV = [
@@ -101,7 +116,7 @@ function drillTimeline(d) {
     const act = acts[(i - 1) % acts.length];
     const mm = String(Math.floor(i / 4)).padStart(2, '0');
     const ss = String((i % 4) * 15).padStart(2, '0');
-    html += `<li class="${isRed ? 'RED' : 'BLUE'}"><b>[R${i} · ${mm}:${ss}]</b> ${isRed ? '🔴' : '🔵'} ${act}</li>`;
+    html += `<li class="${isRed ? 'RED' : 'BLUE'}"><b>[R${i} · ${mm}:${ss}]</b> <span class="dot ${isRed ? 'red' : 'cyan'}"></span> ${act}</li>`;
   }
   html += '</ul><div class="drawer-actions"><button class="btn btn-ghost" data-act="export">导出复盘报告</button></div>';
   return html;
@@ -265,6 +280,15 @@ function viewLeaderboard(content) {
   return store.on('leaderboard', render);
 }
 
+function viewNotFound(content) {
+  content.innerHTML = `
+    <div class="page-head"><div><h1>页面未找到</h1><p>该控制台视图不存在或暂未开放</p></div></div>
+    <div class="notfound panel">
+      <p class="muted">你访问的控制台视图 <b class="mono">${location.hash}</b> 不存在。</p>
+      <a href="#/console" class="btn btn-primary">返回总览</a>
+    </div>`;
+}
+
 const VIEWS = {
   overview: viewOverview, ranges: viewRanges, drills: viewDrills,
   red: (c) => viewTeam(c, 'red'), blue: (c) => viewTeam(c, 'blue'), rank: viewLeaderboard,
@@ -286,7 +310,7 @@ export function mountConsole(root) {
       <main class="main">
         <div class="topbar">
           <button class="menu-btn" id="menuBtn" aria-label="打开菜单">☰</button>
-          <div class="search">${ICONS.search}<input placeholder="搜索靶机 / 演练 / 用户..." /></div>
+          <div class="search">${ICONS.search}<input placeholder="搜索靶机 / 演练 / 用户..." aria-label="搜索靶机、演练或用户" /></div>
           <div class="tb-right"><span class="clock" id="clk">--:--:--</span><div class="bell">${ICONS.bell}<span class="badge"></span></div><div class="avatar">张</div></div>
         </div>
         <div class="content" id="consoleContent"></div>
@@ -301,6 +325,7 @@ export function mountConsole(root) {
   const closeSb = () => { sb.classList.remove('open'); sbBackdrop.classList.remove('show'); };
   root.querySelector('#menuBtn').addEventListener('click', () => { sb.classList.toggle('open'); sbBackdrop.classList.toggle('show'); });
   sbBackdrop.addEventListener('click', closeSb);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSb(); });
 
   const navEls = [...root.querySelectorAll('.sb-item')];
   const contentEl = root.querySelector('#consoleContent');
@@ -311,15 +336,24 @@ export function mountConsole(root) {
   function show(route) {
     if (currentCleanup) currentCleanup();
     currentCleanup = null;
-    navEls.forEach((el) => el.classList.toggle('active', el.dataset.route === route));
+    navEls.forEach((el) => {
+      const on = el.dataset.route === route;
+      el.classList.toggle('active', on);
+      if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+    });
+    const v = VIEWS[route];
     contentEl.innerHTML = '';
     try {
-      const v = VIEWS[route] || VIEWS.overview;
-      currentCleanup = v(contentEl) || null;
+      if (!v) { viewNotFound(contentEl); }
+      else { currentCleanup = v(contentEl) || null; }
     } catch (e) {
       console.error('[玄盾] 视图渲染失败:', e);
       contentEl.innerHTML = '<div class="view-error">视图加载失败：' + (e && e.message ? e.message : e) + '<br/>请刷新页面重试。</div>';
     }
+    // 视图切换淡入（重排触发动画）
+    contentEl.classList.remove('view-enter');
+    void contentEl.offsetWidth;
+    contentEl.classList.add('view-enter');
     contentEl.scrollTop = 0;
   }
   return { show };
