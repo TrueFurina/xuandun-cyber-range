@@ -144,5 +144,3 @@ function startSimulator(store) {
 ## 📜 许可证
 
 [MIT](./LICENSE) © 2026 玄盾 XUANDUN
-
----
